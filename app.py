@@ -166,5 +166,4 @@ with tabs[3]:
     }
 
     st.dataframe(comparison_data, use_container_width=True)
-    st.image("https://miro.medium.com/v2/resize:fit:1400/format:webp/1*jw2nHPGk3nVZTZo2xcpV0g.png", caption="Visual Summary of Algorithm Complexity", use_container_width=True)
 
