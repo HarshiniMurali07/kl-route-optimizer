@@ -23,15 +23,14 @@ tabs = st.tabs(["🏠 Home", "📍 Route Planner", "🧠 Why Dijkstra?", "📊 A
 with tabs[0]:
     st.header("Welcome to the KL City Route Optimizer")
     st.markdown("""
-    This tool helps you compute the **shortest route** between major KL landmarks using **Dijkstra's Algorithm**.
+    Plan your journey through Kuala Lumpur's iconic landmarks with smart, efficient routing. 
+    This tool helps you identify the shortest path between major city locations using the precision of Dijkstra’s Algorithm.
 
-    ✅ Visualizes the graph of locations and connections  
-    ✅ Computes shortest path and total distance  
-    ✅ Highlights the path visually for clarity
+    Whether you're navigating for tourism, logistics, or learning purposes — see your path come to life in a graph, calculated with speed and accuracy.
 
-    Explore how Dijkstra's algorithm works and why it's used in navigation systems worldwide.
+    Learn the science behind the scenes and explore how route optimization algorithms like Dijkstra power real-time navigation across the world.
     """)
-    st.image("https://upload.wikimedia.org/wikipedia/commons/5/57/Dijkstra_Animation.gif", caption="How Dijkstra works (Wikipedia GIF)")
+    st.image("https://upload.wikimedia.org/wikipedia/commons/3/3d/Map_Kuala_Lumpur.svg", caption="Map of Greater Kuala Lumpur", use_container_width=True)
 
 # ---------------------------- ROUTE PLANNER TAB ---------------------------- #
 with tabs[1]:
@@ -90,73 +89,82 @@ with tabs[1]:
 with tabs[2]:
     st.header("🧠 Why Dijkstra's Algorithm?")
     st.markdown("""
-    Dijkstra’s Algorithm is one of the most trusted and widely-used **shortest path algorithms** in the world.  
-    It's the engine behind **GPS apps**, **delivery route planners**, and even **network routing protocols**.
+    Dijkstra’s Algorithm is one of the most widely adopted and trusted techniques for shortest path calculation. It’s the silent brain behind many digital maps, logistics platforms, and real-time navigation tools.
     """)
 
     st.subheader("💡 What Is Dijkstra's Algorithm?")
     st.markdown("""
-    It’s a **greedy algorithm** that finds the shortest path between a starting node and all other nodes in a graph — with non-negative edge weights.
+    Dijkstra’s algorithm is a greedy method to find the shortest path from a source to all nodes in a graph with non-negative edge weights.
 
-    - It explores paths in increasing order of distance.
-    - Uses a **priority queue (min-heap)** to always expand the closest node.
-    - Guarantees the optimal shortest path in graphs without negative weights.
+    - It explores nodes in increasing order of distance from the source.
+    - It uses a **priority queue** to efficiently select the next closest node.
+    - It guarantees an **optimal path** when all weights are positive.
     """)
 
     st.image(
         "https://upload.wikimedia.org/wikipedia/commons/5/57/Dijkstra_Animation.gif",
-        caption="Visualization of Dijkstra's Algorithm (Source: Wikipedia)",
-        use_column_width=True
+        caption="Visualization of Dijkstra's Algorithm",
+        use_container_width=True
     )
 
-    st.subheader("🎯 Why Dijkstra Is So Popular")
+    st.subheader("🌍 Where It's Used")
     st.markdown("""
-    - ✅ **Fast and efficient**: Especially with a priority queue.
-    - ✅ **Widely supported**: Built into libraries like NetworkX.
-    - ✅ **Safe and optimal**: Guarantees the best path if no negative weights.
-    - ✅ **Versatile**: Can be used for both static and real-time routing.
-
-    **Used by:**
-    - 🚗 Google Maps, Waze, Uber
-    - 📦 Amazon Logistics
-    - 📶 Computer Networks (e.g., OSPF routing protocol)
+    - Google Maps, Waze, Uber for route planning
+    - Amazon and logistics routing
+    - Network routing protocols (e.g., OSPF)
     """)
 
     st.subheader("📊 Performance Overview")
     st.markdown("""
-    | Feature                      | Dijkstra              |
-    |------------------------------|------------------------|
-    | Time Complexity              | `O((V + E) log V)`     |
-    | Handles Negative Weights     | ❌ No                  |
-    | Real-time Routing            | ✅ Yes                 |
-    | Memory Usage                 | Moderate               |
-    | Best For                     | Sparse graphs, GPS, logistics |
+    | Metric                 | Value                   |
+    |------------------------|--------------------------|
+    | Time Complexity        | O((V + E) log V)         |
+    | Handles Neg. Weights   | No                      |
+    | Ideal For              | Sparse graphs, real-time pathfinding |
     """)
 
-    st.subheader("🔍 How Dijkstra Compares")
-    st.markdown("""
-    | Algorithm         | Handles Negative Weights | Time Complexity  | Use Case                       |
-    |-------------------|---------------------------|------------------|--------------------------------|
-    | **Dijkstra**      | ❌ No                     | O((V + E) log V) | Fast, accurate for real maps  |
-    | **Bellman-Ford**  | ✅ Yes                    | O(V × E)         | Works with debt/credit graphs |
-    | **Floyd-Warshall**| ✅ Yes                    | O(V³)            | All-pairs path problems        |
-
-    In KL route planning, **Dijkstra is ideal** because:
-    - All routes have **positive weights**
-    - We only need **source-to-target** computation
-    - It’s the **most efficient option**
-    """)
-
-    st.success("That's why Dijkstra is our choice for KL Route Optimization! 🧠")
+    st.success("Dijkstra is chosen for this project due to its efficiency, reliability, and real-world relevance.")
 
 # ---------------------------- COMPARISON TAB ---------------------------- #
 with tabs[3]:
     st.header("📊 Algorithm Comparison")
-    st.markdown("Here's how Dijkstra compares to Bellman-Ford and Floyd-Warshall:")
+    st.markdown("Compare popular shortest path algorithms based on performance and suitability.")
 
-    st.table({
-        "Algorithm": ["Dijkstra", "Bellman-Ford", "Floyd-Warshall"],
-        "Handles Negative Weights": ["❌", "✅", "✅"],
-        "Time Complexity": ["O((V + E) log V)", "O(V × E)", "O(V³)"],
-        "Best For": ["Sparse graphs, real-time routing", "Graphs with negative weights", "All-pairs shortest paths"]
-    })
+    comparison_data = {
+        "Algorithm": [
+            "Dijkstra",
+            "Bellman-Ford",
+            "Floyd-Warshall",
+            "A* Search",
+            "BFS (Unweighted)",
+            "DFS (Unweighted)"
+        ],
+        "Handles Negative Weights": [
+            "No",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "No"
+        ],
+        "Time Complexity": [
+            "O((V + E) log V)",
+            "O(V × E)",
+            "O(V³)",
+            "O((V + E) log V)",
+            "O(V + E)",
+            "O(V + E)"
+        ],
+        "Best For": [
+            "Sparse graphs, GPS navigation",
+            "Graphs with negative weights",
+            "All-pairs path finding",
+            "Heuristic-based search",
+            "Unweighted quick lookup",
+            "Exploration without shortest path guarantee"
+        ]
+    }
+
+    st.dataframe(comparison_data, use_container_width=True)
+    st.image("https://miro.medium.com/v2/resize:fit:1400/format:webp/1*jw2nHPGk3nVZTZo2xcpV0g.png", caption="Visual Summary of Algorithm Complexity", use_container_width=True)
+
