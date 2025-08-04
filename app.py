@@ -1,77 +1,96 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 import networkx as nx
-import folium
-from streamlit_folium import st_folium
 from dijkstra_module import build_graph, dijkstra_with_priority_queue, build_path
 
-# Coordinates for each node (KL locations)
-COORDINATES = {
-    'KLIA': (2.7456, 101.7090),
-    'Putrajaya': (2.9264, 101.6964),
-    'Merdeka 118': (3.1385, 101.6982),
-    'Berjaya Times Square': (3.1420, 101.7104),
-    'Bukit Bintang': (3.1466, 101.7072),
-    'Exchange 106 @ TRX': (3.1390, 101.7225),
-    'Petronas Twin Towers': (3.1579, 101.7123),
-    'Merdeka Square': (3.1478, 101.6946),
-    'KL Tower': (3.1528, 101.7039),
-    'Tabung Haji Tower': (3.1569, 101.7060)
-}
-
-# Page configuration
-st.set_page_config(page_title="KL City Route Optimizer", page_icon="🗺️", layout="wide")
+# Page config
+st.set_page_config(page_title="KL Route Optimizer", page_icon="🗺️", layout="wide")
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
+    .main { background-color: #f0f2f6; }
     .block-container { padding-top: 2rem; padding-bottom: 2rem; }
     </style>
 """, unsafe_allow_html=True)
 
-# App header
-st.title("🧭 KL City Route Optimizer")
-st.markdown("Find the fastest route across key KL landmarks using Dijkstra's Algorithm. Now with interactive map! 🚗")
+# Title
+st.title("🧭 KL City Shortest Path Visualizer")
+st.markdown("Use Dijkstra's Algorithm to find the optimal route across KL landmarks — now in a stylish layout!")
 st.markdown("---")
 
-# Load graph and nodes
+# Build graph and get node list
 G = build_graph()
 nodes = list(G.nodes())
 
+# UI Inputs
 col1, col2 = st.columns(2)
 with col1:
-    source = st.selectbox("📍 Starting Point", nodes)
+    source = st.selectbox("📍 Select Starting Point", nodes)
 with col2:
-    target = st.selectbox("🏁 Destination Point", nodes)
+    target = st.selectbox("🏁 Select Destination", nodes)
 
-# Run algorithm on button click
-if st.button("🔍 Compute Route"):
+# Run Dijkstra on button click
+if st.button("🚦 Compute Shortest Path"):
     if source == target:
-        st.warning("Source and destination must be different.")
+        st.warning("⚠️ Source and destination cannot be the same.")
     else:
         distance_map, previous_map = dijkstra_with_priority_queue(G, source)
         path = build_path(previous_map, target)
 
         if not path:
-            st.error("❌ No path found between selected locations.")
+            st.error("❌ No valid path found.")
         else:
-            st.success(f"✅ Path found from **{source}** to **{target}**!")
+            st.success("✅ Route successfully computed!")
             st.markdown(f"**🛣️ Route:** {' → '.join(path)}")
-            st.info(f"📏 Total Distance: **{distance_map[target]} units**")
+            st.info(f"**📏 Total Distance:** `{distance_map[target]} units`")
 
-            # Map visualization
-            midpoint = COORDINATES[path[len(path)//2]]
-            route_map = folium.Map(location=midpoint, zoom_start=13)
+            # Custom fixed layout
+            pos = {
+                "KLIA": (0, 0),
+                "Putrajaya": (1.5, 0),
+                "Merdeka 118": (2.5, -1),
+                "Berjaya Times Square": (2.5, 1),
+                "Petronas Twin Towers": (3.5, 2),
+                "Bukit Bintang": (3.5, 0.5),
+                "Exchange 106 @ TRX": (4.5, -0.5),
+                "Merdeka Square": (4.5, 1.5),
+                "KL Tower": (5.5, 1.5),
+                "Tabung Haji Tower": (5.5, -0.5),
+            }
 
-            # Add markers and lines
-            for i, loc in enumerate(path):
-                lat, lon = COORDINATES[loc]
-                popup = f"{i+1}. {loc}"
-                icon_color = 'green' if i == 0 else 'red' if i == len(path)-1 else 'blue'
-                folium.Marker(location=(lat, lon), popup=popup, icon=folium.Icon(color=icon_color)).add_to(route_map)
+            fig, ax = plt.subplots(figsize=(10, 8))
 
-            # Draw path
-            route_coords = [COORDINATES[loc] for loc in path]
-            folium.PolyLine(locations=route_coords, color='crimson', weight=5).add_to(route_map)
+            # Draw all nodes and edges
+            nx.draw(
+                G, pos, ax=ax,
+                with_labels=False,
+                node_color='black',
+                node_size=1000,
+                edge_color='black',
+                width=2
+            )
 
-            st_folium(route_map, width=1000, height=550)
+            # Draw white text labels on black nodes
+            for node, (x, y) in pos.items():
+                ax.text(
+                    x, y + 0.2, node,
+                    fontsize=10,
+                    color='white',
+                    ha='center',
+                    va='center',
+                    bbox=dict(facecolor='black', edgecolor='none', boxstyle='round,pad=0.3')
+                )
+
+            # Add all edge labels
+            edge_labels = nx.get_edge_attributes(G, 'weight')
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black', font_size=9, ax=ax)
+
+            # Highlight the shortest path in red
+            path_edges = [(path[i], path[i+1]) for i in range(len(path)-1)]
+            nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='crimson', width=3, ax=ax)
+
+            # Caption and layout
+            ax.set_title("📌 Custom Layout – Network Graph of KL City Routes", fontsize=13)
+            ax.axis('off')
+            st.pyplot(fig)
 else:
-    st.info("👆 Select two different points and click 'Compute Route' to begin.")
+    st.info("👆 Choose two different points and click the button to begin route planning.")
