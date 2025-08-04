@@ -1,54 +1,77 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 import networkx as nx
+import folium
+from streamlit_folium import st_folium
 from dijkstra_module import build_graph, dijkstra_with_priority_queue, build_path
 
-# Page config
+# Coordinates for each node (KL locations)
+COORDINATES = {
+    'KLIA': (2.7456, 101.7090),
+    'Putrajaya': (2.9264, 101.6964),
+    'Merdeka 118': (3.1385, 101.6982),
+    'Berjaya Times Square': (3.1420, 101.7104),
+    'Bukit Bintang': (3.1466, 101.7072),
+    'Exchange 106 @ TRX': (3.1390, 101.7225),
+    'Petronas Twin Towers': (3.1579, 101.7123),
+    'Merdeka Square': (3.1478, 101.6946),
+    'KL Tower': (3.1528, 101.7039),
+    'Tabung Haji Tower': (3.1569, 101.7060)
+}
+
+# Page configuration
 st.set_page_config(page_title="KL City Route Optimizer", page_icon="🗺️", layout="wide")
+st.markdown("""
+    <style>
+    .main { background-color: #f8f9fa; }
+    .block-container { padding-top: 2rem; padding-bottom: 2rem; }
+    </style>
+""", unsafe_allow_html=True)
 
-# Custom title layout
-col1, col2, col3 = st.columns([1, 6, 1])
-with col2:
-    st.markdown("## 🏙️ KL City Route Optimizer")
-    st.caption("🚀 Find the shortest path between landmarks using Dijkstra's Algorithm")
-
+# App header
+st.title("🧭 KL City Route Optimizer")
+st.markdown("Find the fastest route across key KL landmarks using Dijkstra's Algorithm. Now with interactive map! 🚗")
 st.markdown("---")
 
-# Load graph
+# Load graph and nodes
 G = build_graph()
 nodes = list(G.nodes())
 
-# User input: source and target
 col1, col2 = st.columns(2)
 with col1:
-    source = st.selectbox("📍 Select Starting Point", nodes)
+    source = st.selectbox("📍 Starting Point", nodes)
 with col2:
-    target = st.selectbox("🏁 Select Destination", nodes)
+    target = st.selectbox("🏁 Destination Point", nodes)
 
-# Button to find path
-if st.button("🔍 Compute Shortest Path"):
+# Run algorithm on button click
+if st.button("🔍 Compute Route"):
     if source == target:
-        st.warning("Source and destination cannot be the same.")
+        st.warning("Source and destination must be different.")
     else:
-        distance, previous = dijkstra_with_priority_queue(G, source)
-        path = build_path(previous, target)
+        distance_map, previous_map = dijkstra_with_priority_queue(G, source)
+        path = build_path(previous_map, target)
 
         if not path:
-            st.error("❌ No path found.")
+            st.error("❌ No path found between selected locations.")
         else:
-            st.success("✅ Shortest path found!")
-            st.markdown(f"**Path:** {' → '.join(path)}")
-            st.markdown(f"**Total Distance:** `{distance[target]} units`")
+            st.success(f"✅ Path found from **{source}** to **{target}**!")
+            st.markdown(f"**🛣️ Route:** {' → '.join(path)}")
+            st.info(f"📏 Total Distance: **{distance_map[target]} units**")
 
-            # Visualize the path
-            pos = nx.spring_layout(G, seed=42)
-            edge_labels = nx.get_edge_attributes(G, 'weight')
-            path_edges = [(path[i], path[i+1]) for i in range(len(path)-1)]
+            # Map visualization
+            midpoint = COORDINATES[path[len(path)//2]]
+            route_map = folium.Map(location=midpoint, zoom_start=13)
 
-            plt.figure(figsize=(12, 8))
-            nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=1500, font_size=10, edge_color='gray')
-            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black')
-            nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='crimson', width=3)
+            # Add markers and lines
+            for i, loc in enumerate(path):
+                lat, lon = COORDINATES[loc]
+                popup = f"{i+1}. {loc}"
+                icon_color = 'green' if i == 0 else 'red' if i == len(path)-1 else 'blue'
+                folium.Marker(location=(lat, lon), popup=popup, icon=folium.Icon(color=icon_color)).add_to(route_map)
 
-            st.pyplot(plt.gcf())
-            plt.clf()
+            # Draw path
+            route_coords = [COORDINATES[loc] for loc in path]
+            folium.PolyLine(locations=route_coords, color='crimson', weight=5).add_to(route_map)
+
+            st_folium(route_map, width=1000, height=550)
+else:
+    st.info("👆 Select two different points and click 'Compute Route' to begin.")
