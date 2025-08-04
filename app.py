@@ -30,7 +30,7 @@ with tabs[0]:
 
     Learn the science behind the scenes and explore how route optimization algorithms like Dijkstra power real-time navigation across the world.
     """)
-    st.image("https://upload.wikimedia.org/wikipedia/commons/3/3d/Map_Kuala_Lumpur.svg", caption="Map of Greater Kuala Lumpur", use_container_width=True)
+    st.image("istockphoto-521417678-612x612.jpg", caption="Map of Greater Kuala Lumpur", use_container_width=True)
 
 # ---------------------------- ROUTE PLANNER TAB ---------------------------- #
 with tabs[1]:
