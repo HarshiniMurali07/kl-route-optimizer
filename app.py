@@ -89,7 +89,7 @@ if st.button("🚦 Compute Shortest Path"):
             nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='crimson', width=3, ax=ax)
 
             # Caption and layout
-            ax.set_title("📌 Custom Layout – Network Graph of KL City Routes", fontsize=13)
+            ax.set_title(" Custom Layout – Network Graph of KL City Routes", fontsize=13)
             ax.axis('off')
             st.pyplot(fig)
 else:
